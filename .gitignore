@@ -1,0 +1,9 @@
+build
+tmp/
+**.so
+**~
+**swp
+doc/html/**
+doc/man/**
+#src/cmdline.*
+include/config.h

@@ -1,0 +1,57 @@
+package "distexec"
+version "@PROJECT_VERSION@ Copyright (C) 2017 Konrad Lother <k@hiddenbox.org>"
+usage "distexec [OPTIONS]... -- command"
+purpose "Distributed execution of commands."
+
+versiontext "This software is supplied WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. This is
+free software, and you are welcome to redistribute it under certain
+conditions; see the file COPYING for details."
+
+
+section "General"
+option "config" C "Configuration file" string typestr="FILE" optional multiple
+option "output" O "Use --stdout and --stdin combined" optional
+option "stdout" - "Print remote stdout" optional
+option "stderr" - "Print remote stderr" optional
+option "progress" P "Print progressbar" optional
+option "list" l "Print hosts" optional
+
+section "Plugins"
+option "plugin-path" - "Path to plugins" typestr="PATH" string optional multiple default="@PLUGIN_PATH_DEFAULT@"
+option "plugin" p "Plugin to load" typestr="NAME" string optional multiple
+
+section "Filtering"
+option "filter" F "Filter query" typestr="FILTER" string optional
+option "expect" e "Filter output " typestr="REGEX" string optional multiple
+
+section "Execution"
+option "env" E "Environment variable" typestr="KEY=VAL" string optional multiple
+
+section "Concurrency"
+option "concurrent" c "Number of concurrent execution threads" int optional default="1"
+
+section "Logging"
+option "log-split" S "Split logfile per host (needs --log-file)" optional
+option "log-file" L "Log to file instead of stdout" string optional typestr="FILE"
+option "log-format-date" - "Date format" typestr="STRFTIME" string optional default="@LOGGER_FORMAT_DATE@"
+option "log-format-time" - "Time format" typestr="STRFTIME" string optional default="@LOGGER_FORMAT_TIME@"
+option "log-format" - "Log format" typestr="FORMAT" string optional details=" Format variables:
+	%D  - Date (See --log-format-date)
+	%T  - Time (See --log-format-time)
+	%X  - Microseconds part of current second
+	%N  - Logger Name
+	%L  - Log Level
+	%M  - Log Message
+	%f  - File
+	%m  - Function/Method
+	%l  - Line Number
+
+Default format: @LOGGER_FORMAT_DEFAULT@
+"
+
+section "Other"
+option "debug" - "Enable debug messages" flag on
+
+text "
+See the distexec man page for examples."

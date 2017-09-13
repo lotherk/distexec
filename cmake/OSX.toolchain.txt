@@ -1,0 +1,28 @@
+set(CMAKE_SYSTEM_NAME "Darwin" CACHE STRING "")
+set(CMAKE_SYSTEM_VERSION "10.8" CACHE STRING "")
+set(TARGET_ARCH "x86_64" CACHE STRING "")
+
+set(CMAKE_C_COMPILER "x86_64-apple-darwin12-cc" CACHE STRING "")
+set(CMAKE_AR "x86_64-apple-darwin12-ar" CACHE STRING "")
+set(CMAKE_RANLIB "x86_64-apple-darwin12-ranlib" CACHE STRING "")
+set(PKG_CONFIG_EXECUTABLE "x86_64-apple-darwin12-pkg-config" CACHE STRING "")
+set(CMAKE_CXX_FLAGS "-v" CACHE STRING "")
+
+set(CMAKE_OSX_SYSROOT "/opt/osxcross/target/SDK/MacOSX10.8.sdk" CACHE STRING "")
+set(CMAKE_FIND_ROOT_PATH "/opt/osxcross/target/macports/pkgs/opt/local" CACHE STRING "")
+
+# search for programs in the build host directories
+SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+# for libraries and headers in the target directories
+SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
+link_directories(/opt/osxcross/target/macports/pkgs/opt/local/lib)              
+include_directories(/opt/osxcross/target/macports/pkgs/opt/local/include)              
+install(FILES /opt/osxcross/target/macports/pkgs/opt/local/lib/libjson-c.2.dylib DESTINATION lib)
+install(FILES /opt/osxcross/target/macports/pkgs/opt/local/lib/libpcre.1.dylib DESTINATION lib)
+install(FILES /opt/osxcross/target/macports/pkgs/opt/local/lib/libssh2.1.dylib DESTINATION lib)
+install(FILES /opt/osxcross/target/macports/pkgs/opt/local/lib/libcurl.4.dylib DESTINATION lib)
+install(FILES /opt/osxcross/target/macports/pkgs/opt/local/lib/libssl.1.0.0.dylib DESTINATION lib)
+install(FILES /opt/osxcross/target/macports/pkgs/opt/local/lib/libcrypto.1.0.0.dylib DESTINATION lib)
+
