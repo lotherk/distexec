@@ -30,21 +30,22 @@ static logger_t logger;
 
 int main(int argc, char *argv[])
 {
-    int rc;
+	int rc;
 
-    /* logger initialization */
-    rc = logger_init(&logger);
-    if (0 != rc) {
-        fprintf(stderr, "Error while initializing logger: %s\n", strerror(errno));
-        fflush(stderr);
-        exit(EXIT_FAILURE);
-    }
+	/* logger initialization */
+	rc = logger_init(&logger);
+	if (0 != rc) {
+		fprintf(stderr, "Error while initializing logger: %s\n",
+			strerror(errno));
+		fflush(stderr);
+		exit(EXIT_FAILURE);
+	}
 
-    logger.out = stdout;
-    logger.err = stderr;
-    logger.name = "core";
+	logger.out = stdout;
+	logger.err = stderr;
+	logger.name = "core";
 
-    /* command line parsing */
+	/* command line parsing */
 
 	/* initialize gengetopt parser */
 	struct cmdline_parser_params *params;
@@ -69,8 +70,5 @@ int main(int argc, char *argv[])
 		}
 	}
 
-
-
-
-    return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }

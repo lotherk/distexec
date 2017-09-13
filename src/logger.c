@@ -60,19 +60,18 @@ static char *strlevel(loglevel_t level)
 }
 
 void
-logger_log(logger_t *logger, loglevel_t level, int severity,
-		   const char *filepath, const char *func, unsigned int line,
-		   char *format, ...)
+logger_log(logger_t * logger, loglevel_t level, int severity,
+	   const char *filepath, const char *func, unsigned int line,
+	   char *format, ...)
 {
 #ifdef LOGGER_DISABLE
 	return;
 #else
 
-    if (1 != logger->initialized) {
-        errno = EINVAL;
-        return;
-    }
-
+	if (1 != logger->initialized) {
+		errno = EINVAL;
+		return;
+	}
 #ifndef LOGGER_DEBUG
 	if (logger->level == LDEBUG)
 		return;
@@ -203,10 +202,10 @@ static char *_get_strftime(time_t * rawtime, char *format, size_t len)
 
 int logger_init(logger_t * logger)
 {
-    if (1 == logger->initialized) {
-        errno = EINVAL;
-        return -EINVAL;
-    }
+	if (1 == logger->initialized) {
+		errno = EINVAL;
+		return -EINVAL;
+	}
 
 	logger->out = NULL;
 	logger->err = NULL;
@@ -214,7 +213,6 @@ int logger_init(logger_t * logger)
 	logger->format_date = LOGGER_FORMAT_DATE;
 	logger->format_time = LOGGER_FORMAT_TIME;
 	logger->level = default_level;
-    logger->initialized = 1;
+	logger->initialized = 1;
 	return 0;
 }
-
