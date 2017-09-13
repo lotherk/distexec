@@ -65,22 +65,23 @@ typedef struct {
 #define __FILENAME__ __FILE__
 #endif
 
-#define LOGGER(logger, level, ...) log(logger, level, 0,\
+#define LOGGER(logger, level, ...) logger_log(logger, level, 0,\
 				     __FILENAME__, \
 				     __func__, \
 				     __LINE__, \
 				     __VA_ARGS__)
 
-#define LOG_INFO(logger, ...)       LOGGER(logger, LINFO, __VA_ARGS__)
-#define LOG_WARN(logger, ...)       LOGGER(logger, LWARNING, __VA_ARGS__)
-#define LOG_ERROR(logger, ...)      LOGGER(logger, LERROR, __VA_ARGS__)
-#define LOG_CRITICAL(logger, ...)   LOGGER(logger, LCRITICAL, __VA_ARGS__)
-#define LOG_FATAL(logger, ...)      LOGGER(logger, LFATAL, __VA_ARGS__)
-#define LOG_DEBUG(logger, ...)      LOGGER(logger, LDEBUG, __VA_ARGS__)
+#define _INFO(logger, ...)       LOGGER(logger, LINFO, __VA_ARGS__)
+#define _WARN(logger, ...)       LOGGER(logger, LWARNING, __VA_ARGS__)
+#define _ERROR(logger, ...)      LOGGER(logger, LERROR, __VA_ARGS__)
+#define _CRITICAL(logger, ...)   LOGGER(logger, LCRITICAL, __VA_ARGS__)
+#define _FATAL(logger, ...)      LOGGER(logger, LFATAL, __VA_ARGS__)
+#define _DEBUG(logger, ...)      LOGGER(logger, LDEBUG, __VA_ARGS__)
 
-void log(logger_t logger, loglevel_t level, int severity, const char *filepath, const char *func,
+void logger_log(logger_t *logger, loglevel_t level, int severity, const char *filepath, const char *func,
 	  unsigned int line, char *fmt, ...);
 
+int logger_init(logger_t *logger);
 
 #ifdef __cplusplus
 }

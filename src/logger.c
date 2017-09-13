@@ -37,8 +37,6 @@
 static loglevel_t default_level =
     LINFO | LWARNING | LERROR | LFATAL | LCRITICAL;
 
-static list_t *loggers = NULL;
-
 static char *_get_strftime(time_t * rawtime, char *format, size_t len);
 
 static char *strlevel(loglevel_t level)
@@ -62,7 +60,7 @@ static char *strlevel(loglevel_t level)
 }
 
 void
-log(logger_t *logger, loglevel_t level, int severity,
+logger_log(logger_t *logger, loglevel_t level, int severity,
 		   const char *filepath, const char *func, unsigned int line,
 		   char *format, ...)
 {
@@ -70,8 +68,10 @@ log(logger_t *logger, loglevel_t level, int severity,
 	return;
 #else
 
-    if (1 != logger->initialized)
-        return -EINVAL;
+    if (1 != logger->initialized) {
+        errno = EINVAL;
+        return;
+    }
 
 #ifndef LOGGER_DEBUG
 	if (logger->level == LDEBUG)
@@ -203,8 +203,10 @@ static char *_get_strftime(time_t * rawtime, char *format, size_t len)
 
 int logger_init(logger_t * logger)
 {
-    if (1 == logger->initialized)
+    if (1 == logger->initialized) {
+        errno = EINVAL;
         return -EINVAL;
+    }
 
 	logger->out = NULL;
 	logger->err = NULL;

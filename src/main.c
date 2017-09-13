@@ -19,18 +19,58 @@
  *
  */
 
+#include <stdio.h>
+#include <errno.h>
+
 #include "distexec/logger.h"
+
+#include "cmdline.h"
 
 static logger_t logger;
 
 int main(int argc, char *argv[])
 {
-    logger_init(&logger);
+    int rc;
+
+    /* logger initialization */
+    rc = logger_init(&logger);
+    if (0 != rc) {
+        fprintf(stderr, "Error while initializing logger: %s\n", strerror(errno));
+        fflush(stderr);
+        exit(EXIT_FAILURE);
+    }
+
     logger.out = stdout;
     logger.err = stderr;
     logger.name = "core";
 
-    LOG_INFO("test 1 2 %s", "drei");
+    /* command line parsing */
+
+	/* initialize gengetopt parser */
+	struct cmdline_parser_params *params;
+	struct gengetopt_args_info args_info;
+	params = cmdline_parser_params_create();
+
+	if (cmdline_parser(argc, argv, &args_info) != 0)
+		exit(EXIT_FAILURE);
+
+	/* potential end-less loop */
+	if (args_info.config_given > 0) {
+		params->initialize = 0;
+		params->override = 1;
+		int i;
+		for (i = 0; i < args_info.config_given; i++) {
+			params->initialize = 0;
+			params->override = 1;
+			if (cmdline_parser_config_file
+			    (args_info.config_arg[i], &args_info, params)
+			    != 0)
+				exit(EXIT_FAILURE);
+		}
+	}
+
+
+
 
     return EXIT_SUCCESS;
 }

@@ -11,8 +11,8 @@ include(FindPkgConfig)
 find_package(PkgConfig)
 #include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPack.txt)
 
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src) # for gengetopt...
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src) # for gengetopt...
 
 set(LOGGER_FORMAT_DEFAULT "%D %T.%X [%N] %L %f:%m:%l: %M")
 set(LOGGER_FORMAT_DATE    "%Y-%m-%d")
@@ -32,7 +32,7 @@ option(EXEC_PLUGIN "Enable exec plugin" OFF)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__='\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"'")
 
 CONFIGURE_FILE(cmdline.ggo.in cmdline.ggo @ONLY)
-CONFIGURE_FILE(config.h.in include/config.h @ONLY)
+CONFIGURE_FILE(config.h.in ../include/config.h @ONLY)
 
 execute_process(COMMAND gengetopt -C --input cmdline.ggo --output-dir ../src --unamed-opts=SCRIPTS)
 execute_process(COMMAND git log OUTPUT_FILE ChangeLog.txt)
@@ -45,6 +45,8 @@ add_library(libdistexec SHARED
 		src/distexec.c
 		src/plugin.c
 )
+
+set_target_properties(libdistexec PROPERTIES PREFIX "")
 
 pkg_check_modules(LIBPCRE REQUIRED libpcre)
 include_directories(${LIBPCRE_INCLUDE_DIR}) # does not work on osxcross
