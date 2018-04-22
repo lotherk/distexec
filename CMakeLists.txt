@@ -48,9 +48,9 @@ add_library(libdistexec SHARED
 
 set_target_properties(libdistexec PROPERTIES PREFIX "")
 
-pkg_check_modules(LIBPCRE REQUIRED libpcre)
-include_directories(${LIBPCRE_INCLUDE_DIR}) # does not work on osxcross
-target_link_libraries(libdistexec ${LIBPCRE_LDFLAGS})
+#pkg_check_modules(LIBPCRE REQUIRED libpcre)
+#include_directories(${LIBPCRE_INCLUDE_DIR}) # does not work on osxcross
+#target_link_libraries(libdistexec ${LIBPCRE_LDFLAGS})
 target_link_libraries(libdistexec "dl")
 target_link_libraries(libdistexec "pthread")
 target_link_libraries(libdistexec "m")

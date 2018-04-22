@@ -39,6 +39,7 @@ struct gengetopt_args_info
 {
   const char *help_help; /**< @brief Print help and exit help description.  */
   const char *detailed_help_help; /**< @brief Print help, including all details and hidden options, and exit help description.  */
+  const char *full_help_help; /**< @brief Print help, including hidden options, and exit help description.  */
   const char *version_help; /**< @brief Print version and exit help description.  */
   char ** config_arg;	/**< @brief Configuration file.  */
   char ** config_orig;	/**< @brief Configuration file original value given at command line.  */
@@ -63,19 +64,19 @@ struct gengetopt_args_info
   char * filter_arg;	/**< @brief Filter query.  */
   char * filter_orig;	/**< @brief Filter query original value given at command line.  */
   const char *filter_help; /**< @brief Filter query help description.  */
-  char ** expect_arg;	/**< @brief Filter output .  */
-  char ** expect_orig;	/**< @brief Filter output  original value given at command line.  */
-  unsigned int expect_min; /**< @brief Filter output 's minimum occurreces */
-  unsigned int expect_max; /**< @brief Filter output 's maximum occurreces */
-  const char *expect_help; /**< @brief Filter output  help description.  */
+  char ** grep_arg;	/**< @brief Filter output .  */
+  char ** grep_orig;	/**< @brief Filter output  original value given at command line.  */
+  unsigned int grep_min; /**< @brief Filter output 's minimum occurreces */
+  unsigned int grep_max; /**< @brief Filter output 's maximum occurreces */
+  const char *grep_help; /**< @brief Filter output  help description.  */
   char ** env_arg;	/**< @brief Environment variable.  */
   char ** env_orig;	/**< @brief Environment variable original value given at command line.  */
   unsigned int env_min; /**< @brief Environment variable's minimum occurreces */
   unsigned int env_max; /**< @brief Environment variable's maximum occurreces */
   const char *env_help; /**< @brief Environment variable help description.  */
-  int concurrent_arg;	/**< @brief Number of concurrent execution threads (default='1').  */
-  char * concurrent_orig;	/**< @brief Number of concurrent execution threads original value given at command line.  */
-  const char *concurrent_help; /**< @brief Number of concurrent execution threads help description.  */
+  int concurrent_arg;	/**< @brief Number of concurrent connection threads (default='1').  */
+  char * concurrent_orig;	/**< @brief Number of concurrent connection threads original value given at command line.  */
+  const char *concurrent_help; /**< @brief Number of concurrent connection threads help description.  */
   const char *log_split_help; /**< @brief Split logfile per host (needs --log-file) help description.  */
   char * log_file_arg;	/**< @brief Log to file instead of stdout.  */
   char * log_file_orig;	/**< @brief Log to file instead of stdout original value given at command line.  */
@@ -94,6 +95,7 @@ struct gengetopt_args_info
   
   unsigned int help_given ;	/**< @brief Whether help was given.  */
   unsigned int detailed_help_given ;	/**< @brief Whether detailed-help was given.  */
+  unsigned int full_help_given ;	/**< @brief Whether full-help was given.  */
   unsigned int version_given ;	/**< @brief Whether version was given.  */
   unsigned int config_given ;	/**< @brief Whether config was given.  */
   unsigned int output_given ;	/**< @brief Whether output was given.  */
@@ -104,7 +106,7 @@ struct gengetopt_args_info
   unsigned int plugin_path_given ;	/**< @brief Whether plugin-path was given.  */
   unsigned int plugin_given ;	/**< @brief Whether plugin was given.  */
   unsigned int filter_given ;	/**< @brief Whether filter was given.  */
-  unsigned int expect_given ;	/**< @brief Whether expect was given.  */
+  unsigned int grep_given ;	/**< @brief Whether grep was given.  */
   unsigned int env_given ;	/**< @brief Whether env was given.  */
   unsigned int concurrent_given ;	/**< @brief Whether concurrent was given.  */
   unsigned int log_split_given ;	/**< @brief Whether log-split was given.  */
@@ -136,6 +138,8 @@ extern const char *gengetopt_args_info_usage;
 extern const char *gengetopt_args_info_description;
 /** @brief all the lines making the help output */
 extern const char *gengetopt_args_info_help[];
+/** @brief all the lines making the full help output (including hidden options) */
+extern const char *gengetopt_args_info_full_help[];
 /** @brief all the lines making the detailed help output (including hidden options and details) */
 extern const char *gengetopt_args_info_detailed_help[];
 
@@ -199,6 +203,10 @@ int cmdline_parser_file_save(const char *filename,
  * Print the help
  */
 void cmdline_parser_print_help(void);
+/**
+ * Print the full help (including hidden options)
+ */
+void cmdline_parser_print_full_help(void);
 /**
  * Print the detailed help (including hidden options and details)
  */

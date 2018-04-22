@@ -22,20 +22,24 @@ option "plugin-path" - "Path to plugins" typestr="PATH" string optional multiple
 option "plugin" p "Plugin to load" typestr="NAME" string optional multiple
 
 section "Filtering"
-option "filter" F "Filter query" typestr="FILTER" string optional
-option "expect" e "Filter output " typestr="REGEX" string optional multiple
+option "filter" F "Filter query" typestr="FILTER" string optional details="The filter query is passed to each collector.
+Each collector might use other query syntax.
+
+This just sucks."
+
+option "grep" g "Filter output " typestr="REGEX" string optional multiple
 
 section "Execution"
 option "env" E "Environment variable" typestr="KEY=VAL" string optional multiple
 
 section "Concurrency"
-option "concurrent" c "Number of concurrent execution threads" int optional default="1"
+option "concurrent" c "Number of concurrent connection threads" int optional default="1"
 
 section "Logging"
 option "log-split" S "Split logfile per host (needs --log-file)" optional
 option "log-file" L "Log to file instead of stdout" string optional typestr="FILE"
-option "log-format-date" - "Date format" typestr="STRFTIME" string optional default="@LOGGER_FORMAT_DATE@"
-option "log-format-time" - "Time format" typestr="STRFTIME" string optional default="@LOGGER_FORMAT_TIME@"
+option "log-format-date" - "Date format" typestr="STRFTIME" string optional default="@LOGGER_FORMAT_DATE@" hidden
+option "log-format-time" - "Time format" typestr="STRFTIME" string optional default="@LOGGER_FORMAT_TIME@" hidden
 option "log-format" - "Log format" typestr="FORMAT" string optional details=" Format variables:
 	%D  - Date (See --log-format-date)
 	%T  - Time (See --log-format-time)
@@ -48,7 +52,7 @@ option "log-format" - "Log format" typestr="FORMAT" string optional details=" Fo
 	%l  - Line Number
 
 Default format: @LOGGER_FORMAT_DEFAULT@
-"
+" hidden
 
 section "Other"
 option "debug" - "Enable debug messages" flag on
