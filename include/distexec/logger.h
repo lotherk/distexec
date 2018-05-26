@@ -20,6 +20,10 @@
  *
  */
 
+
+
+
+
 #ifndef DISTEXEC_LOGGER_H
 #define DISTEXEC_LOGGER_H
 #include <stdio.h>
@@ -49,7 +53,6 @@ typedef enum {
 
 
 typedef struct {
-    unsigned char initialized;
 	char *name;
 	char *format;
 	char *format_date;
@@ -57,31 +60,52 @@ typedef struct {
 	loglevel_t level;
 	FILE *out;
 	FILE *err;
-} logger_t;
+} libdistexec_logger_t;
+
+
+
+
+#ifdef LOGGER_DEBUG
+#define DEBUG 1
+#else
+#define DEBUG 0
+#endif
+
+#define LOG_CORE(...) if (DEBUG) { fprintf(stderr,  __VA_ARGS__); fflush(stderr); }
 
 #define LOGGER_MAX_LEN 4096
+
+#if !defined(MACRO_LOGGER)
+#define MACRO_LOGGER *libdistexec_logger_core()
+#endif
 
 #if !defined(__FILENAME__)
 #define __FILENAME__ __FILE__
 #endif
 
-#define LOGGER(logger, level, ...) logger_log(logger, level, 0,\
+#define LOGGER(LEVEL, ...) libdistexec_logger(MACRO_LOGGER, LEVEL, \
 				     __FILENAME__, \
 				     __func__, \
 				     __LINE__, \
 				     __VA_ARGS__)
 
-#define _INFO(logger, ...)       LOGGER(logger, LINFO, __VA_ARGS__)
-#define _WARN(logger, ...)       LOGGER(logger, LWARNING, __VA_ARGS__)
-#define _ERROR(logger, ...)      LOGGER(logger, LERROR, __VA_ARGS__)
-#define _CRITICAL(logger, ...)   LOGGER(logger, LCRITICAL, __VA_ARGS__)
-#define _FATAL(logger, ...)      LOGGER(logger, LFATAL, __VA_ARGS__)
-#define _DEBUG(logger, ...)      LOGGER(logger, LDEBUG, __VA_ARGS__)
+#define LOG_INFO(...)       LOGGER(LINFO, __VA_ARGS__)
+#define LOG_WARN(...)       LOGGER(LWARNING, __VA_ARGS__)
+#define LOG_ERROR(...)      LOGGER(LERROR, __VA_ARGS__)
+#define LOG_CRITICAL(...)   LOGGER(LCRITICAL, __VA_ARGS__)
+#define LOG_FATAL(...)      LOGGER(LFATAL, __VA_ARGS__)
+#define LOG_DEBUG(...)      LOGGER(LDEBUG, __VA_ARGS__)
 
-void logger_log(logger_t *logger, loglevel_t level, int severity, const char *filepath, const char *func,
+EXPORT void libdistexec_logger(libdistexec_logger_t logger, loglevel_t level, const char *filepath, const char *func,
 	  unsigned int line, char *fmt, ...);
 
-int logger_init(logger_t *logger);
+EXPORT void libdistexec_logger_set_level(loglevel_t level);
+EXPORT int libdistexec_logger_set_format(char *format);
+EXPORT int libdistexec_logger_set_format_date(char *format);
+EXPORT int libdistexec_logger_set_format_time(char *format);
+EXPORT int libdistexec_logger_new(libdistexec_logger_t *logger, const char *name);
+EXPORT int libdistexec_logger_init(FILE * out, FILE * err);
+EXPORT libdistexec_logger_t *libdistexec_logger_core();
 
 #ifdef __cplusplus
 }

@@ -19,7 +19,8 @@
  */
 
 #include "distexec/logger.h"
-#include <errno.h>
+#include "distexec/error.h"
+#include "distexec/util.h"
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
@@ -34,8 +35,24 @@
 
 #endif
 
+static char *default_format = LOGGER_FORMAT_DEFAULT;
+static char *default_format_date = LOGGER_FORMAT_DATE;
+static char *default_format_time = LOGGER_FORMAT_TIME;
+
 static loglevel_t default_level =
     LINFO | LWARNING | LERROR | LFATAL | LCRITICAL;
+
+static libdistexec_logger_t core_logger = {
+	.name = NULL,
+	.out = NULL,
+	.err = NULL,
+	.level = LINFO,
+	.format = LOGGER_FORMAT_DEFAULT,
+	.format_date = LOGGER_FORMAT_DATE,
+	.format_time = LOGGER_FORMAT_TIME,
+};
+
+static libdistexec_list_t *loggers = NULL;
 
 static char *_get_strftime(time_t * rawtime, char *format, size_t len);
 
@@ -59,25 +76,29 @@ static char *strlevel(loglevel_t level)
 	}
 }
 
-void
-logger_log(logger_t * logger, loglevel_t level, int severity,
-	   const char *filepath, const char *func, unsigned int line,
-	   char *format, ...)
+EXPORT int libdistexec_logger_init(FILE * out, FILE * err)
+{
+	libdistexec_list_init(loggers, libdistexec_logger_t *, 0);
+	libdistexec_logger_new(&core_logger, "core");
+	core_logger.out = out;
+	core_logger.err = err;
+	return 0;
+}
+
+EXPORT void
+libdistexec_logger(libdistexec_logger_t logger, loglevel_t level,
+		   const char *filepath, const char *func, unsigned int line,
+		   char *format, ...)
 {
 #ifdef LOGGER_DISABLE
 	return;
 #else
 
-	if (1 != logger->initialized) {
-		errno = EINVAL;
-		return;
-	}
 #ifndef LOGGER_DEBUG
-	if (logger->level == LDEBUG)
+	if (logger.level == LDEBUG)
 		return;
 #endif
-
-	if ((logger->level != LALL) && (0 == (logger->level & level)))
+	if ((logger.level != LALL) && (0 == (logger.level & level)))
 		return;
 
 	char mbuf[LOGGER_MAX_LEN];
@@ -87,12 +108,12 @@ logger_log(logger_t * logger, loglevel_t level, int severity,
 	vsnprintf(mbuf, LOGGER_MAX_LEN, format, list);
 	va_end(list);
 
-	// see logger.h enum. Everything below LWARNING should go to err out
+	// see libdistexec_logger.h enum. Everything below LWARNING should go to err out
 	FILE *out = NULL;
 	if (level < LWARNING) {
-		out = logger->err;
+		out = logger.err;
 	} else {
-		out = logger->out;
+		out = logger.out;
 	}
 
 	if (NULL == out)
@@ -132,7 +153,7 @@ logger_log(logger_t * logger, loglevel_t level, int severity,
 	findex += strlen(str);
 
 	/* parse log format */
-	for (p = logger->format; *p != '\0'; p++) {
+	for (p = logger.format; *p != '\0'; p++) {
 		if (*p == '%') {
 			p++;
 		} else {
@@ -145,16 +166,16 @@ logger_log(logger_t * logger, loglevel_t level, int severity,
 			fbuf[findex++] = '%';
 			break;
 		case 'D':
-			REPL_TIME(logger->format_date, 32);
+			REPL_TIME(logger.format_date, 32);
 			break;
 		case 'T':
-			REPL_TIME(logger->format_time, 32);
+			REPL_TIME(logger.format_time, 32);
 			break;
 		case 'X':
 			REPL_NUM("%03d", msec);
 			break;
 		case 'N':
-			REPL_STR(logger->name);
+			REPL_STR(logger.name);
 			break;
 		case 'L':
 			REPL_STR(strlevel(level));
@@ -173,7 +194,7 @@ logger_log(logger_t * logger, loglevel_t level, int severity,
 			break;
 		default:
 			fprintf(stderr, "Log format error: %%%c - %s\n", *p,
-				logger->format);
+				logger.format);
 			fflush(stderr);
 			exit(EXIT_FAILURE);
 		}
@@ -200,19 +221,48 @@ static char *_get_strftime(time_t * rawtime, char *format, size_t len)
 	return strdup(buf);
 }
 
-int logger_init(logger_t * logger)
+EXPORT int libdistexec_logger_new(libdistexec_logger_t * logger,
+				  const char *name)
 {
-	if (1 == logger->initialized) {
-		errno = EINVAL;
-		return -EINVAL;
-	}
-
-	logger->out = NULL;
-	logger->err = NULL;
-	logger->format = LOGGER_FORMAT_DEFAULT;
-	logger->format_date = LOGGER_FORMAT_DATE;
-	logger->format_time = LOGGER_FORMAT_TIME;
+	logger->name = strdup(name);
+	logger->out = core_logger.out;
+	logger->err = core_logger.err;
+	logger->format = default_format;
+	logger->format_date = default_format_date;
+	logger->format_time = default_format_time;
 	logger->level = default_level;
-	logger->initialized = 1;
+	libdistexec_list_add(loggers, libdistexec_logger_t *, logger);
 	return 0;
+}
+
+EXPORT int libdistexec_logger_set_format(char *format)
+{
+	default_format = format;
+	core_logger.format = format;
+	return 0;
+}
+
+EXPORT int libdistexec_logger_set_format_date(char *format)
+{
+	default_format_date = format;
+	core_logger.format_date = format;
+	return 0;
+}
+
+EXPORT int libdistexec_logger_set_format_time(char *format)
+{
+	default_format_time = format;
+	core_logger.format_time = format;
+	return 0;
+}
+
+EXPORT void libdistexec_logger_set_level(loglevel_t level)
+{
+	default_level = level;
+	core_logger.level = level;
+}
+
+EXPORT libdistexec_logger_t *libdistexec_logger_core()
+{
+	return &core_logger;
 }
